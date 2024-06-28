@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+
+  book_service:
+    build: ./book_service
+    command: poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./book_service/:/app/
+    ports:
+      - 8000:8000
+    env_file:
+      - ./book_service/.env
+    depends_on:
+      - book_db
+
+  book_db:
+    image: postgres:16.0
+    volumes:
+      - postgres_data_book:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=book_username
+      - POSTGRES_PASSWORD=book_password
+      - POSTGRES_DB=book_db_dev
+      - POSTGRES_HOST_NAME=book_db
+    expose:
+      - 5432
+
+volumes:
+  postgres_data_book:
